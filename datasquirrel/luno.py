@@ -1,9 +1,9 @@
 
-from pyluno.api import Luno
+from pyluno.api import Luno, LunoAPIRateLimitError
+
 from . import utils
 
 import os
-import math
 import json
 import pandas as pd
 import time
@@ -39,6 +39,11 @@ class BaseCollector(utils.BaseClass):
     def _stop_time(self):
         self.stoptime = time.time()
 
+    def _save_dataframe(self, df):
+        with pd.HDFStore(self.dataPath, format='table',
+                         complevel=9, complib='blosc') as store:
+            store.append('trades', df, format='table')
+
 
 class LunoCollector(BaseCollector):
     """TODO """
@@ -54,37 +59,56 @@ class LunoCollector(BaseCollector):
                 with open(os.path.join(self.rootDir, self.authFile)) \
                  as authFile:
                     authJson = json.load(authFile)
-                self.api = Luno(authJson['key'], authJson['secret'])
+                options = {'maxRate': 0.2, 'maxBurst': 5}
+                self.api = Luno(authJson['key'], authJson['secret'], options)
                 logger.info('Found auth file, created authenticated API')
             else:
-                self.api = Luno('', '')
+                options = {'maxRate': 0.2, 'maxBurst': 5}
+                self.api = Luno('', '', options)
                 logger.warning('API not provided and no auth found.\
                                Using non-authenticated (Reduced Rates)')
         self._stop_time()
 
-    def new_collection(self, fromdate):
-        # self._check_new_collection()
-        fetchedtime = fromdate
-        df = pd.DataFrame()
+    def new_collection(self, fromtime):
+        self._check_new_collection()
+        df = self._get_data(fromtime)
+        self._save_dataframe(df)
+        logger.info('Complete. New collection fetched.')
+
+    def collect(self):
+        with pd.HDFStore(os.path.join(self.dataDir, self.dataFile)) as store:
+            nrows = store.get_storer('trades').nrows
+            lastval = store.select('trades', start=nrows - 1, stop=nrows)
+            fromtime = ((lastval.index.astype(int).max())/10e8)
+            logger.info('Last fetched time is: {}'.format(
+                time.strftime('%Y-%m-%d %H:%M:%S',
+                              time.localtime(fromtime))))
+        df = self._get_data(fromtime)
+
+        self._save_dataframe(df)
+        logger.info('Complete. {} new trades added.'.format(len(df)))
+
+    def _get_data(self, fromtime, df=pd.DataFrame()):
+        fetchedtime = fromtime
         while fetchedtime < int(self.stoptime):
-            dft = self.api.get_trades_frame(since=int(round(fetchedtime*1000)))
+            try:
+                dft = self.api.get_trades_frame(
+                    since=int(round(fetchedtime*1000)))
+            except LunoAPIRateLimitError as e:
+                dft = pd.DataFrame()
+                logger.error(e)
             if dft.empty:
                 break
             fetchedtime = ((dft.index.astype(int).max())/10e8)
             df = pd.concat([df, dft])
-            if len(df) > 1000000:
-                pass
-                logger.warning('Large df')
-                # TODO: Write dataframe to file, clear dataframe end carry on
+            if len(df) > 1000:
+                logger.info('Large dataframe. Writing to disc')
+                self._save_dataframe(df)
+                df = pd.DataFrame()
             logger.info('Getting data... Last call got to: {}'.format(
                 time.strftime('%Y-%m-%d %H:%M:%S',
                               time.localtime(fetchedtime))))
-        with pd.HDFStore(self.dataPath, format='table') as store:
-            store.append('trades', df, complevel=5, format='table')
-        logger.info('Complete. New collection fetched.')
-
-    def collect(self):
-        pass
+        return df
 
     def _last_fetched(self):
         pass

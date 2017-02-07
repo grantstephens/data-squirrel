@@ -8,6 +8,7 @@ LOG_DIR = os.path.join(ROOT_DIR, 'logs')
 AUTH_FILE = 'auth.json'
 DATA_FILE = 'data.h5'
 
+
 class BaseClass(object):
     """docstring for """
     def __init__(self):
