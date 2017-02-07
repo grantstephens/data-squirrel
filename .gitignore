@@ -2,3 +2,4 @@ data/
 dump/
 *.pyc
 *.egg-info/
+*.log
