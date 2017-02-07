@@ -4,7 +4,7 @@ from . import utils
 
 import os
 import math
-# import numpy as np
+import json
 import pandas as pd
 import time
 import logging
@@ -50,8 +50,16 @@ class LunoCollector(BaseCollector):
             self.dataFile = 'luno_' + self.dataFile
         self.dataPath = os.path.join(self.dataDir, self.dataFile)
         if api is None:
-            self.api = Luno('', '')
-            logger.warning('API not provided. Created one with no authentication')
+            if os.path.isfile(os.path.join(self.rootDir, self.authFile)):
+                with open(os.path.join(self.rootDir, self.authFile)) \
+                 as authFile:
+                    authJson = json.load(authFile)
+                self.api = Luno(authJson['key'], authJson['secret'])
+                logger.info('Found auth file, created authenticated API')
+            else:
+                self.api = Luno('', '')
+                logger.warning('API not provided and no auth found.\
+                               Using non-authenticated (Reduced Rates)')
         self._stop_time()
 
     def new_collection(self, fromdate):

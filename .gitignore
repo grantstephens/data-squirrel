@@ -3,3 +3,4 @@ dump/
 *.pyc
 *.egg-info/
 *.log
+auth.json
