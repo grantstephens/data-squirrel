@@ -1,0 +1,13 @@
+language: python
+python:
+- '3.5'
+script:
+- touch foo
+deploy:
+  provider: pypi
+  user: grantstephens
+  password:
+    secure: TnQUFxLDSY1XnTXHUu5Itjz+XWU+0vYUj/bPn9vHt05qTd9ap/HrYIrOoQpSxCz3m1QpwUoAQwqWlAW0USwSfNJwhgRPMLK9H5eNdEdDx+yOJZa/I2igkitC91RQVOX3e/HgJzejQ0FwFLCiyyiU6Jcsvg4Ek9/FCjleS76hUwFzHmm6iJmxn15+RkoHrcz5E2OdA2iKaahxbX+R6CLSclw4Aol838l4f/Xu/MzpGuQJ9lsnj5vsoU476HvLnndcwfipM68GWdisBsk4JN2mua2r4vRCmmDKDwMcZ3JaBYx3qYxqSCf7HLLhmIQXY+B99FX97uSx0ePI3MkDtGBEDCsN8bPfaKmCzw5a5C6jJKRrnIjO/rC22bl7s50Z0QnbHmQtx7zVu64MUfJ+iXLUZhEKfXs3gE/4+G67hYDdiX/Xj3O8A91y0lmctGUPDKEUA2NpMUXcDsQ1J08wZnXCieEEdtovJNF+8Xgwi8LzbQf5nwnGRFpWL8FW6EH74l+NfvZYCWpQeI0p8+REXy5DUb+epej1d6zlqtWPj7Qt1f2WAXiYyg9d8XaHNq0Y6b1Xn8jLiTVMefOZUPpq92vUcqvb/SKQ3JgRxU3o62YCsfGHsJtRF6wn69qLWxMHVvSbSf0iM+TrSvw+ZkjzNPEvPJ89cfEBh8TDAyuUwkz9q2E=
+  on:
+    tags: true
+    branch: master
