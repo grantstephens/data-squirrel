@@ -5,3 +5,4 @@ dump/
 *.log
 auth.json
 build/
+dist/
