@@ -93,4 +93,4 @@ class BaseCollector(BaseClass):
             self.auth[child+'_key'] = None
             self.auth[child+'_secret'] = None
             self.log.warning('API not provided and no auth found.' +
-                             'Using non-authenticated (Reduced Rates)')
+                             'Using non-authenticated (Reduced rates)')

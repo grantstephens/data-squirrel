@@ -15,4 +15,3 @@ logging.config.fileConfig(
     pkg_resources.resource_filename(__name__, 'logging.ini'))
 
 logger = logging.getLogger(__name__)
-logger.info('Test')
