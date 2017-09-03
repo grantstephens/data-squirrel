@@ -1,4 +1,4 @@
 {
-  "key":"yourkeyhere",
-  "secret":"yoursecrethere"
+  "luno_key": "yourkeyhere",
+  "luno_secret": "yoursecrethere"
 }

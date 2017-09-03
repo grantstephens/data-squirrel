@@ -38,6 +38,6 @@ setup(
     ],
     # test_suite='tests',
     # tests_require=[
-        # 'requests-mock>=0.7.0'
+    #     'requests-mock>=0.7.0'
     # ]
 )

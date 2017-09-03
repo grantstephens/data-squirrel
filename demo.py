@@ -1,17 +1,18 @@
-from datasquirrel import luno
-from datasquirrel import btcc
+# from datasquirrel import btcc
 import time
+
+from datasquirrel import btcc, googlefinance, luno
 
 start = time.time()-(24*3600*404)
 
-collector = luno.Collector()
-try:
-    collector.new_collection(start)
-except:
-    collector.collect()
+luno_col = luno.LunoCollector()
+# luno_col.new_collection(start)
+luno_col.collect()
 
-collector = btcc.Collector()
-try:
-    collector.new_collection(start)
-except:
-    collector.collect()
+btcc_col = btcc.BTCCCollector()
+# btcc_col.new_collect()
+btcc_col.collect()
+
+usdzar_col = googlefinance.GFCollector('USDZAR')
+# usdzar_col.new_collect()
+usdzar_col.collect()
