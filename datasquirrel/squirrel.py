@@ -22,16 +22,15 @@ class Squirrel(BaseClass):
         if not os.path.exists(self.data_dir):
             os.makedirs(self.data_dir, exist_ok=True)
             self.log.info(
-                'Path did not exist. Created: {}'.format(
-                    os.path.dirname(self.data_dir))
+                'Path did not exist. Created: {}'.format(self.data_dir)
                 )
-        # import ipdb; ipdb.set_trace()
         if not wanted_nuts:
             wanted_nuts = []
             for fn in os.listdir(self.data_dir):
                 if fn.endswith('.h5'):
                     wanted_nuts.append(fn.split('_')[0])
             if not wanted_nuts:
+                self.log.exception('No nuts found or given')
                 raise IOError('No nuts found or given')
         self.nuts = {}
         if 'luno' in wanted_nuts:
@@ -47,7 +46,7 @@ class Squirrel(BaseClass):
     def newborn(self, start_time=None):
         """Start a new set of collections."""
         if start_time is None:
-            start_time = time.time()-(3600)
+            start_time = time.time()-(3600*20)
         self.log.info('Newbord Collection starting from: {}'.format(
             time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time))))
         for nut_name, nut in self.nuts.items():
