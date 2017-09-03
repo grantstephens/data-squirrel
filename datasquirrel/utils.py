@@ -19,22 +19,24 @@ log = logging.getLogger(__name__)
 class BaseClass(object):
     """docstring for """
 
-    def __init__(self):
-        # self.log = logging.getLogger(__class__)
+    def __init__(self, data_dir):
+        self.log = logging.getLogger(self.__class__.__name__)
         self.root_dir = ROOT_DIR
-        self.data_dir = DATA_DIR
         self.data_file = DATA_FILE
         self.auth_file = AUTH_FILE
+        if data_dir is not None:
+            self.data_dir = data_dir
+        else:
+            self.data_dir = DATA_DIR
 
 
 class BaseCollector(BaseClass):
     """TODO"""
     def __init__(self, child, data_dir=None, data_file=None, auth_file=None):
-        super(BaseCollector, self).__init__()
+        super(BaseCollector, self).__init__(data_dir)
         # import ipdb; ipdb.set_trace()
-        self.log = logging.getLogger(self.__class__.__name__)
-        if data_dir is not None:
-            self.data_dir = data_dir
+        self.log = logging.getLogger(self.__class__.__name__+' ({})'.format(child))
+
         if data_file is not None:
             self.data_file = data_file
         else:
@@ -54,6 +56,10 @@ class BaseCollector(BaseClass):
                 'Path did not exist. Created: {}'.format(
                     os.path.dirname(self.data_dir))
                 )
+
+    def _check_existing_collection(self):
+        if not os.path.isfile(self.data_dir):
+            raise Exception('Data file does not exist: {}'.format(self.data_dir))
 
     def _stop_time(self):
         if not hasattr(self, 'stoptime'):

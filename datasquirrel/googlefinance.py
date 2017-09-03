@@ -34,17 +34,19 @@ class GFCollector(utils.BaseCollector):
             self.api = api
         self._stop_time()
 
-    def new_collection(self):
+    def new_collection(self, start_time):
         self._check_new_collection()
         period = '20Y'  # Max
         df = self._get_data(86400, period)
         for interval in [3600, 1800, 900, 600, 300, 120, 60]:
             dft = self._get_data(interval, period)
             df = pd.concat([df[:dft.index[0]], dft])
+        df = df[pd.to_datetime(start_time, unit='s'):]
         self._save_dataframe(df)
         self.log.info('Complete. New collection fetched.')
 
     def collect(self):
+        self._check_existing_collection()
         with pd.HDFStore(self.data_dir) as store:
             nrows = store.get_storer('trades').nrows
             lastval = store.select('trades', start=nrows - 1, stop=nrows)

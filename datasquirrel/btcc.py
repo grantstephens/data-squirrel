@@ -41,6 +41,7 @@ class BTCCCollector(BaseCollector):
         self.log.info('Complete. New collection fetched.')
 
     def collect(self):
+        self._check_existing_collection()
         with pd.HDFStore(self.data_dir) as store:
             nrows = store.get_storer('trades').nrows
             lastval = store.select('trades', start=nrows - 1, stop=nrows)
