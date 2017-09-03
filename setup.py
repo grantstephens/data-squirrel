@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open('datasquirrel/_version.py') as f:
     exec(f.read())
@@ -36,6 +36,9 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3 :: Only'
     ],
+    entry_points= {
+        'console_scripts': ['squirrel=datasquirrel.console:main'],
+        },
     # test_suite='tests',
     # tests_require=[
     #     'requests-mock>=0.7.0'

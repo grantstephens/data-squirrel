@@ -63,7 +63,7 @@ class LunoCollector(BaseCollector):
                     since=int(round(fetchedtime*1000)))
             except LunoAPIRateLimitError as e:
                 dft = pd.DataFrame()
-                self.log.error(e)
+                self.log.exception(e)
             if dft.empty:
                 break
             fetchedtime = ((dft.index.astype(int).max())/10e8)

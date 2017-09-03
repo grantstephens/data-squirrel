@@ -48,10 +48,12 @@ class BaseCollector(BaseClass):
 
     def _check_new_collection(self):
         if os.path.isfile(self.data_dir):
-            raise Exception('File Exists! Delete {} before starting a new\
-                            collection'.format(self.data_dir))
+            msg = 'File Exists! Delete {} before starting a new\
+                collection'.format(self.data_dir)
+            self.log.exception(msg)
+            raise Exception(msg)
         if not os.path.exists(os.path.dirname(self.data_dir)):
-            os.makedirs(os.path.dirname(self.data_dir))
+            os.makedirs(os.path.dirname(self.data_dir), exist_ok=True)
             self.log.info(
                 'Path did not exist. Created: {}'.format(
                     os.path.dirname(self.data_dir))
@@ -59,7 +61,9 @@ class BaseCollector(BaseClass):
 
     def _check_existing_collection(self):
         if not os.path.isfile(self.data_dir):
-            raise Exception('Data file does not exist: {}'.format(self.data_dir))
+            msg = 'Data file does not exist: {}'.format(self.data_dir)
+            self.log.exception(msg)
+            raise Exception(msg)
 
     def _stop_time(self):
         if not hasattr(self, 'stoptime'):

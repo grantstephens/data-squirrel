@@ -70,7 +70,7 @@ class BTCCCollector(BaseCollector):
                     limit=5000, since=fetchedid, sincetype='id')
             except btccAPIRateLimitError as e:
                 dft = pd.DataFrame()
-                self.log.error(e)
+                self.log.exception(e)
             if dft.empty:
                 break
             fetchedid = dft.tid[-1]

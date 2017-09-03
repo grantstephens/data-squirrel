@@ -67,7 +67,7 @@ class GFCollector(utils.BaseCollector):
             df.drop(['high', 'low', 'open', 'volume'], axis=1, inplace=True)
         except GoogleFinanceAPIRateLimitError as e:
             df = pd.DataFrame()
-            self.log.error(e)
+            self.log.exception(e)
         stime = ((df.index.astype(int).min())/10e8)
         # df = self._partial_save(df)
         self.log.info('Getting data... Last call started at: {}'.format(
