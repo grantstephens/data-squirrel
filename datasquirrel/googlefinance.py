@@ -43,7 +43,8 @@ class GFCollector(utils.BaseCollector):
             df = pd.concat([df[:dft.index[0]], dft])
         df = df[pd.to_datetime(start_time, unit='s'):]
         self._save_dataframe(df)
-        self.log.info('Complete. New collection fetched.')
+        self.log.info('Complete. New collection fetched ' +
+                      'with {} entries'.format(len(df)))
 
     def collect(self):
         self._check_existing_collection()

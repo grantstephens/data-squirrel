@@ -1,6 +1,5 @@
-
+"""BTCC Collector module."""
 import logging
-import os
 import time
 
 import pandas as pd
@@ -24,8 +23,11 @@ Notes:
 class BTCCCollector(BaseCollector):
     """BTCC Collector."""
 
-    def __init__(self, data_dir=None, data_file=None, auth_file=None, api=None):
-        super(BTCCCollector, self).__init__('btcc', data_dir, data_file, auth_file)
+    def __init__(self, data_dir=None, data_file=None,
+                 auth_file=None, api=None):
+        """Make new btcc collector."""
+        super(BTCCCollector, self).__init__('btcc',
+                                            data_dir, data_file, auth_file)
         if api is None:
             options = {'maxRate': 10, 'maxBurst': 50}
             self.api = btcc(self.auth['btcc_key'], self.auth['btcc_secret'],
@@ -35,12 +37,14 @@ class BTCCCollector(BaseCollector):
         self._stop_time()
 
     def new_collection(self, fromtime):
+        """Start new collection."""
         self._check_new_collection()
         df = self._get_data(fromtime, new=True)
         self._save_dataframe(df)
         self.log.info('Complete. New collection fetched.')
 
     def collect(self):
+        """Collect new data using previous collection."""
         self._check_existing_collection()
         with pd.HDFStore(self.data_dir) as store:
             nrows = store.get_storer('trades').nrows

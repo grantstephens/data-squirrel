@@ -1,10 +1,11 @@
+"""Utilities used by the squirrel."""
 import json
 import logging
 import os.path
+import threading
 import time
 
 import pandas as pd
-import pkg_resources
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 LIB_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -17,9 +18,10 @@ log = logging.getLogger(__name__)
 
 
 class BaseClass(object):
-    """docstring for """
+    """Class with common variables."""
 
     def __init__(self, data_dir):
+        """Make new with the given data directory."""
         self.log = logging.getLogger(self.__class__.__name__)
         self.root_dir = ROOT_DIR
         self.data_file = DATA_FILE
@@ -31,11 +33,14 @@ class BaseClass(object):
 
 
 class BaseCollector(BaseClass):
-    """TODO"""
+    """Base Collector class with common methods."""
+
     def __init__(self, child, data_dir=None, data_file=None, auth_file=None):
+        """Made new base collector using some child data."""
         super(BaseCollector, self).__init__(data_dir)
         # import ipdb; ipdb.set_trace()
-        self.log = logging.getLogger(self.__class__.__name__+' ({})'.format(child))
+        self.log = logging.getLogger(
+            self.__class__.__name__+' ({})'.format(child))
 
         if data_file is not None:
             self.data_file = data_file
@@ -104,3 +109,21 @@ class BaseCollector(BaseClass):
             self.auth[child+'_secret'] = None
             self.log.warning('API not provided and no auth found.' +
                              'Using non-authenticated (Reduced rates)')
+
+
+class NutRoute (threading.Thread):
+    """Threading the different nuts."""
+
+    def __init__(self, nut, action='forrage', start_time=None):
+        """Make new route, i.e. thread."""
+        threading.Thread.__init__(self)
+        self.nut = nut
+        self.action = action
+        self.start_time = start_time
+
+    def run(self):
+        """Start the actual process."""
+        if self.action is 'forrage':
+            self.nut.collect()
+        elif self.action is 'newborn':
+            self.nut.new_collection(self.start_time)

@@ -1,13 +1,14 @@
 
 import logging
 import os
+import threading
 import time
 
 from . import utils
 from .btcc import BTCCCollector
 from .googlefinance import GFCollector
 from .luno import LunoCollector
-from .utils import BaseClass
+from .utils import BaseClass, NutRoute
 
 
 class Squirrel(BaseClass):
@@ -45,17 +46,26 @@ class Squirrel(BaseClass):
 
     def newborn(self, start_time=None):
         """Start a new set of collections."""
+        routes = []
         if start_time is None:
             start_time = time.time()-(3600*20)
         self.log.info('Newbord Collection starting from: {}'.format(
             time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time))))
         for nut_name, nut in self.nuts.items():
             self.log.info('Starting new collection of {}'.format(nut_name))
-            nut.new_collection(start_time)
+            # nut.new_collection(start_time)
+            routes.append(NutRoute(nut, action='newborn',
+                                   start_time=start_time))
+        [_.start() for _ in routes]
+        [_.join() for _ in routes]
         self.log.info('Newborn born- Yay!')
 
     def forrage(self):
         """Go get more data. Get ALL the Data!."""
+        routes = []
         for nut_name, nut in self.nuts.items():
-            nut.collect()
+            # nut.collect()
+            routes.append(NutRoute(nut, action='forrage'))
+        [_.start() for _ in routes]
+        [_.join() for _ in routes]
         self.log.info('Finished forraging. Going back to sleep')
