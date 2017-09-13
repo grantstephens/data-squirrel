@@ -1,10 +1,8 @@
 
 import logging
 import os
-import threading
 import time
 
-from . import utils
 from .btcc import BTCCCollector
 from .googlefinance import GFCollector
 from .luno import LunoCollector
@@ -18,6 +16,7 @@ class Squirrel(BaseClass):
         """Get up squirrel."""
         super(Squirrel, self).__init__(data_dir)
         self.log.info('Squirrel awoken!')
+        self.log.info(data_dir)
         if data_dir is not None:
             self.data_dir = data_dir
         if not os.path.exists(self.data_dir):
@@ -31,7 +30,7 @@ class Squirrel(BaseClass):
                 if fn.endswith('.h5'):
                     wanted_nuts.append(fn.split('_')[0])
             if not wanted_nuts:
-                self.log.exception('No nuts found or given')
+                self.log.error('No nuts found or given')
                 raise IOError('No nuts found or given')
         self.nuts = {}
         if 'luno' in wanted_nuts:
@@ -46,26 +45,26 @@ class Squirrel(BaseClass):
 
     def newborn(self, start_time=None):
         """Start a new set of collections."""
-        routes = []
+        # routes = []
         if start_time is None:
             start_time = time.time()-(3600*20)
         self.log.info('Newbord Collection starting from: {}'.format(
             time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time))))
         for nut_name, nut in self.nuts.items():
             self.log.info('Starting new collection of {}'.format(nut_name))
-            # nut.new_collection(start_time)
-            routes.append(NutRoute(nut, action='newborn',
-                                   start_time=start_time))
-        [_.start() for _ in routes]
-        [_.join() for _ in routes]
+            nut.new_collection(start_time)
+        #     routes.append(NutRoute(nut, action='newborn',
+        #                            start_time=start_time))
+        # [_.start() for _ in routes]
+        # [_.join() for _ in routes]
         self.log.info('Newborn born- Yay!')
 
     def forrage(self):
         """Go get more data. Get ALL the Data!."""
-        routes = []
+        # routes = []
         for nut_name, nut in self.nuts.items():
-            # nut.collect()
-            routes.append(NutRoute(nut, action='forrage'))
-        [_.start() for _ in routes]
-        [_.join() for _ in routes]
+            nut.collect()
+        #     routes.append(NutRoute(nut, action='forrage'))
+        # [_.start() for _ in routes]
+        # [_.join() for _ in routes]
         self.log.info('Finished forraging. Going back to sleep')

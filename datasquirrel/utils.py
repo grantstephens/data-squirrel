@@ -6,15 +6,17 @@ import threading
 import time
 
 import pandas as pd
+import pkg_resources
 
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-LIB_DIR = os.path.abspath(os.path.dirname(__file__))
+ROOT_DIR = os.path.join(
+    os.path.dirname(
+        pkg_resources.resource_filename(__name__, 'utils.py'))
+    , '..')
+LIB_DIR = os.path.join(ROOT_DIR, 'datasquirrel')
 DATA_DIR = os.path.join(ROOT_DIR, 'data')
 LOG_DIR = os.path.join(ROOT_DIR, 'logs')
 AUTH_FILE = 'auth.json'
 DATA_FILE = 'data.h5'
-
-log = logging.getLogger(__name__)
 
 
 class BaseClass(object):
@@ -28,6 +30,12 @@ class BaseClass(object):
         self.auth_file = AUTH_FILE
         if data_dir is not None:
             self.data_dir = data_dir
+            if os.path.exists(os.path.join(
+                    os.path.dirname(data_dir), 'auth.json')):
+                self.auth_file = os.path.join(
+                    os.path.dirname(data_dir), 'auth.json')
+                self.log.info('Found auth.json in data directory.' +
+                              ' Will use it unless other auth file was given.')
         else:
             self.data_dir = DATA_DIR
 
@@ -38,9 +46,8 @@ class BaseCollector(BaseClass):
     def __init__(self, child, data_dir=None, data_file=None, auth_file=None):
         """Made new base collector using some child data."""
         super(BaseCollector, self).__init__(data_dir)
-        # import ipdb; ipdb.set_trace()
         self.log = logging.getLogger(
-            self.__class__.__name__+' ({})'.format(child))
+        self.__class__.__name__+' ({})'.format(child))
 
         if data_file is not None:
             self.data_file = data_file
@@ -49,6 +56,13 @@ class BaseCollector(BaseClass):
         self.data_dir = os.path.join(self.data_dir, self.data_file)
         if auth_file is not None:
             self.auth_file = auth_file
+            self.log.info('Using given auth file')
+        else:
+            if not os.path.exists(self.auth_file):
+                self.log.warning(
+                    'auth.json not found. Using example_auth.json')
+                self.auth_file = os.path.join(
+                    os.path.dirname(self.auth_file), 'example_auth.json')
         self._load_auth(child)
 
     def _check_new_collection(self):
@@ -127,3 +141,7 @@ class NutRoute (threading.Thread):
             self.nut.collect()
         elif self.action is 'newborn':
             self.nut.new_collection(self.start_time)
+
+
+def testfunc():
+    logging.info('Tetsing')
