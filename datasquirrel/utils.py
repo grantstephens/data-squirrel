@@ -93,7 +93,7 @@ class BaseCollector(BaseClass):
 
     def _save_dataframe(self, df):
         with pd.HDFStore(self.data_dir, format='table',
-                         complevel=9, complib='blosc') as store:
+                         complevel=9, complib='zlib') as store:
             store.append('trades', df, format='table')
 
     def _partial_save(self, df):
